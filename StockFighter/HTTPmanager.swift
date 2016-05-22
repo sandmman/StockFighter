@@ -54,7 +54,7 @@ func HTTPGetJSON(url: String, callback: (Dictionary<String, AnyObject>, String?)
             }
         }
     
-    sleep(1)
+    sleep(2)
 }
 
 /*
@@ -89,7 +89,7 @@ func HTTPPostJSON(url: String,
                             callback(jsonObj, nil)
                         }
                     }
-       sleep(1)
+       sleep(2)
 }
 
 
