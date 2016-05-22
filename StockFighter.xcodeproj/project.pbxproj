@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E33FBE211CF1F8A000C35D04 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33FBE201CF1F8A000C35D04 /* main.swift */; };
-		E33FBE281CF1F8EE00C35D04 /* broker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33FBE271CF1F8EE00C35D04 /* broker.swift */; };
+		E33FBE281CF1F8EE00C35D04 /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33FBE271CF1F8EE00C35D04 /* GameManager.swift */; };
 		E33FBE2A1CF1F9D100C35D04 /* HTTPmanager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33FBE291CF1F9D100C35D04 /* HTTPmanager.swift */; };
 		E33FBE2C1CF1FAB100C35D04 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33FBE2B1CF1FAB100C35D04 /* JSON.swift */; };
 /* End PBXBuildFile section */
@@ -28,7 +28,7 @@
 /* Begin PBXFileReference section */
 		E33FBE1D1CF1F8A000C35D04 /* StockFighter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StockFighter; sourceTree = BUILT_PRODUCTS_DIR; };
 		E33FBE201CF1F8A000C35D04 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		E33FBE271CF1F8EE00C35D04 /* broker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = broker.swift; sourceTree = "<group>"; };
+		E33FBE271CF1F8EE00C35D04 /* GameManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
 		E33FBE291CF1F9D100C35D04 /* HTTPmanager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPmanager.swift; sourceTree = "<group>"; };
 		E33FBE2B1CF1FAB100C35D04 /* JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -64,7 +64,7 @@
 			isa = PBXGroup;
 			children = (
 				E33FBE201CF1F8A000C35D04 /* main.swift */,
-				E33FBE271CF1F8EE00C35D04 /* broker.swift */,
+				E33FBE271CF1F8EE00C35D04 /* GameManager.swift */,
 				E33FBE291CF1F9D100C35D04 /* HTTPmanager.swift */,
 				E33FBE2B1CF1FAB100C35D04 /* JSON.swift */,
 			);
@@ -130,7 +130,7 @@
 			files = (
 				E33FBE2A1CF1F9D100C35D04 /* HTTPmanager.swift in Sources */,
 				E33FBE211CF1F8A000C35D04 /* main.swift in Sources */,
-				E33FBE281CF1F8EE00C35D04 /* broker.swift in Sources */,
+				E33FBE281CF1F8EE00C35D04 /* GameManager.swift in Sources */,
 				E33FBE2C1CF1FAB100C35D04 /* JSON.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -251,6 +251,7 @@
 				E33FBE261CF1F8A000C35D04 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

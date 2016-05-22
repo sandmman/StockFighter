@@ -73,6 +73,8 @@ func HTTPPostJSON(url: String,
         
         request.HTTPMethod = "POST"
         request.addValue("c081a375c684d85eeb16e263bdc7e8b5574ba280", forHTTPHeaderField: "X-Starfighter-Authorization")
+        
+        //request.addValue("c081a375c684d85eeb16e263bdc7e8b5574ba280", forHTTPHeaderField: "Cookie:api_key")
 
         let jsonString = JSONToString(jsonObj)
         let data: NSData = jsonString.dataUsingEncoding(NSUTF8StringEncoding)!

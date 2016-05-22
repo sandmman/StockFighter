@@ -8,18 +8,87 @@
 
 import Foundation
 
-
+ public class StockFighter {
+    
+    let game_url = "https://www.stockfighter.io/gm"
+    let base_url = "https://api.stockfighter.io/ob/api"
+    let apikey  = "123456123456123456123456123456123456123456"
+    
+    var broker: Broker?
+    var gameInstance: String?
+    
+    init() {
+        broker = nil
+        gameInstance = nil
+    }
+    
+    // Todo: Socket Setup //
+    // Game setup functions //
+    
+    func start(level: String){
+        
+        let gameInfo = gameManager("\(game_url)/levels/\(level)")
+        
+        let account = gameInfo["account"]! as! String
+        let stocks  = gameInfo["tickers"]!
+        let venues  = gameInfo["venues"]!
+        
+        self.gameInstance = String(gameInfo["instanceId"]!)
+        self.broker = Broker(account: account , venue: venues[0] as! String , stock: stocks[0] as! String)
+        
+    }
+    func stop(instance: Int){
+        
+        gameManager("\(game_url)/instances/\(instance)/stop")
+        
+        // Clear Game data
+        broker = nil
+        gameInstance = nil
+    
+    }
+    func resume(instance: Int){
+        
+        let gameInfo = gameManager("\(game_url)/instances/\(instance)/resume")
+        
+        let account = gameInfo["account"]! as! String
+        let stocks  = gameInfo["tickers"]!
+        let venues  = gameInfo["venues"]!
+        
+        self.gameInstance = String(gameInfo["instanceId"]!)
+        self.broker = Broker(account: account , venue: venues[0] as! String , stock: stocks[0] as! String)
+        
+    }
+    func restart(instance: Int){
+        
+        gameManager("\(game_url)/instances/\(instance)/restart")
+        
+    }
+    private func gameManager(url: String) -> Dictionary<String, AnyObject>{
+        
+        var dict = Dictionary<String, AnyObject>()
+        
+        HTTPPostJSON(url, jsonObj: "null") {
+            (data: Dictionary<String, AnyObject>, error: String?) -> Void in
+            
+            if error != nil {
+                print("Error Starting New Game \(error)")
+            } else {
+                dict = data
+            }
+            
+        }
+        
+        return dict
+    }
+ }
  
-public class Broker {
+public class Broker: StockFighter {
     
     var account: String
     var venue: String
     var stock: String
     
     var order_IDs: Dictionary<Int, Bool>
-    
-    let base_url = "https://api.stockfighter.io/ob/api"
-    let apikey  = "123456123456123456123456123456123456123456"
 
     init(account: String, venue: String, stock: String){
         self.account = account
@@ -71,8 +140,7 @@ public class Broker {
     /* Finds the most recent quote for a given stock */
     func requestQuote(venue: String, stock: String) -> Int{
         
-        let quoteUrl = "https://api.stockfighter.io/ob/api/venues/\(venue)/stocks/\(stock)/quote"
-        
+        let quoteUrl = "\(base_url)/venues/\(venue)/stocks/\(stock)/quote"
         var quote = -1
         
         HTTPGetJSON(quoteUrl) {
@@ -94,7 +162,7 @@ public class Broker {
     */
     func getMyOrder(venue: String, stock: String, id: Int) -> Dictionary<String, AnyObject>? {
         
-        let orderURL = "https://api.stockfighter.io/ob/api/venues/\(venue)/stocks/\(stock)/orders/\(id)"
+        let orderURL = "\(base_url)/venues/\(venue)/stocks/\(stock)/orders/\(id)"
         
         var order: Dictionary<String, AnyObject>? = nil
         
@@ -109,10 +177,10 @@ public class Broker {
         return order
     }
     
-    /* Cancels Given orders */
+    /* Cancels Given Order */
     func cancelOrder(venue: String, stock: String, id: Int) {
         
-        let cancelUrl = "https://api.stockfighter.io/ob/api/venues/\(venue)/stocks/\(stock)/orders/\(id)/cancel"
+        let cancelUrl = "\(base_url)/venues/\(venue)/stocks/\(stock)/orders/\(id)/cancel"
         
         HTTPGetJSON(cancelUrl) {
             (data: Dictionary<String, AnyObject>, error:String?) -> Void in
