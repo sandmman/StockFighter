@@ -9,16 +9,24 @@
 import Foundation
 
 
-var totalFilled = 88057
+
+
+
+var gm = StockFighter()
+
+try gm.reset("first_steps")
+
+var floor = Floor(game: gm)
+
+print(floor.venue,floor.stock,floor.account)
+
+let stock = floor.stock
+let venue = floor.venue
+let account = floor.account
+
+var totalFilled = 0
 var goal        = 100000
-var goalPrice   = 7856.0
-
-
-let game = StockFighter()
-game.start("first_steps")
-print(game.broker!.account,game.broker!.venue,game.broker!.stock)
-
-print(game.broker?.requestQuote((game.broker?.venue)!, stock: (game.broker?.stock)!))
+var goalPrice   = 100.0
 
 /*while goal != totalFilled {
 
@@ -28,18 +36,20 @@ print(game.broker?.requestQuote((game.broker?.venue)!, stock: (game.broker?.stoc
     }
     
     
-    let currentPrice = myBroker.requestQuote(venue, stock: stock)
-    let diff = Int(goalPrice * 0.95) - currentPrice
-   
-    if diff > 0 && currentPrice != -1 {
+    let currentPrice = floor.requestQuote(venue, stock: stock)
+    floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice, qty: newQty, direction: "Buy", orderType: "Market")
+
+    //let diff = Int(goalPrice * 0.95) - currentPrice
+    //print(currentPrice)
+    /*if diff > 0 && currentPrice != -1 {
         let mod = Int(arc4random_uniform(UInt32(diff)) + 1)
         print("Making Market Trade")
-        myBroker.requestTrade(account, venue: venue, stock: stock, price: currentPrice + mod, qty: newQty, direction: "Buy", orderType: "Market")
+        floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice + mod, qty: newQty, direction: "Buy", orderType: "Market")
     } else if diff < -100 {
         continue
     } else {
         print("Making Limit Trade at \(currentPrice)")
-        myBroker.requestTrade(account, venue: venue, stock: stock, price: currentPrice, qty: newQty, direction: "buy", orderType: "limit")
+        floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice, qty: newQty, direction: "buy", orderType: "limit")
     }
     totalFilled += newQty
     
@@ -47,5 +57,4 @@ print(game.broker?.requestQuote((game.broker?.venue)!, stock: (game.broker?.stoc
     
     print("\(totalFilled)/\(goal)")
     
-    //sleep(5)
 }*/
