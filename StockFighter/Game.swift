@@ -10,12 +10,14 @@ import Foundation
 
 public class Game {
     
+    var level: String
     var stock: [String]
     var venue: [String]
     var account: String
     var ID: String
     
-    init(stock: [String], venue: [String], account: String, instance: String) {
+    init(level: String, stock: [String], venue: [String], account: String, instance: String) {
+        self.level = level
         self.stock = stock
         self.venue = venue
         self.account = account

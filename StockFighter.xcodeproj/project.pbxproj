@@ -11,6 +11,7 @@
 		E33FBE281CF1F8EE00C35D04 /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33FBE271CF1F8EE00C35D04 /* GameManager.swift */; };
 		E33FBE2A1CF1F9D100C35D04 /* HTTPmanager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33FBE291CF1F9D100C35D04 /* HTTPmanager.swift */; };
 		E33FBE2C1CF1FAB100C35D04 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33FBE2B1CF1FAB100C35D04 /* JSON.swift */; };
+		E343F84F1CF8ACA500B7E598 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E343F84E1CF8ACA400B7E598 /* Errors.swift */; };
 		E35C46701CF75A9400924366 /* NSCharacterSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35C465A1CF75A9400924366 /* NSCharacterSet.swift */; };
 		E35C46711CF75A9400924366 /* SocketAckEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35C465B1CF75A9400924366 /* SocketAckEmitter.swift */; };
 		E35C46721CF75A9400924366 /* SocketAckManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35C465C1CF75A9400924366 /* SocketAckManager.swift */; };
@@ -55,6 +56,7 @@
 		E33FBE271CF1F8EE00C35D04 /* GameManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
 		E33FBE291CF1F9D100C35D04 /* HTTPmanager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPmanager.swift; sourceTree = "<group>"; };
 		E33FBE2B1CF1FAB100C35D04 /* JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
+		E343F84E1CF8ACA400B7E598 /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		E35C465A1CF75A9400924366 /* NSCharacterSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSCharacterSet.swift; sourceTree = "<group>"; };
 		E35C465B1CF75A9400924366 /* SocketAckEmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketAckEmitter.swift; sourceTree = "<group>"; };
 		E35C465C1CF75A9400924366 /* SocketAckManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketAckManager.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 			children = (
 				E33FBE201CF1F8A000C35D04 /* main.swift */,
 				E33FBE271CF1F8EE00C35D04 /* GameManager.swift */,
+				E343F84E1CF8ACA400B7E598 /* Errors.swift */,
 				E35C46901CF7759200924366 /* Game.swift */,
 				E35C468E1CF7729000924366 /* TradingFloor.swift */,
 				E33FBE291CF1F9D100C35D04 /* HTTPmanager.swift */,
@@ -212,6 +215,7 @@
 				E35C46761CF75A9400924366 /* SocketEnginePacketType.swift in Sources */,
 				E33FBE2A1CF1F9D100C35D04 /* HTTPmanager.swift in Sources */,
 				E35C46791CF75A9400924366 /* SocketEngineWebsocket.swift in Sources */,
+				E343F84F1CF8ACA500B7E598 /* Errors.swift in Sources */,
 				E35C467C1CF75A9400924366 /* SocketIOClientOption.swift in Sources */,
 				E35C467D1CF75A9400924366 /* SocketIOClientSpec.swift in Sources */,
 				E35C467E1CF75A9400924366 /* SocketIOClientStatus.swift in Sources */,

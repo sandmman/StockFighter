@@ -8,53 +8,35 @@
 
 import Foundation
 
-
-
-
-
 var gm = StockFighter()
 
-try gm.reset("first_steps")
+try gm.reset("chock_a_block")
 
 var floor = Floor(game: gm)
 
-print(floor.venue,floor.stock,floor.account)
+var goal = 1000
+var totalFilled = 0
 
-let stock = floor.stock
-let venue = floor.venue
+let stock = floor.stock[0]
+let venue = floor.venue[0]
 let account = floor.account
 
-var totalFilled = 0
-var goal        = 100000
-var goalPrice   = 100.0
+print("Account Number: \(account)")
+print("Stock: \(stock) Venue: \(venue)")
 
-/*while goal != totalFilled {
+let currentPrice = floor.requestQuote(venue, stock: stock)
 
-    var newQty = Int(arc4random_uniform(UInt32(2000)) + 1)
-    if goal - totalFilled < 5000 {
-        newQty = goal - totalFilled
-    }
-    
-    
-    let currentPrice = floor.requestQuote(venue, stock: stock)
-    floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice, qty: newQty, direction: "Buy", orderType: "Market")
 
-    //let diff = Int(goalPrice * 0.95) - currentPrice
-    //print(currentPrice)
-    /*if diff > 0 && currentPrice != -1 {
-        let mod = Int(arc4random_uniform(UInt32(diff)) + 1)
-        print("Making Market Trade")
-        floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice + mod, qty: newQty, direction: "Buy", orderType: "Market")
-    } else if diff < -100 {
-        continue
-    } else {
-        print("Making Limit Trade at \(currentPrice)")
-        floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice, qty: newQty, direction: "buy", orderType: "limit")
-    }
-    totalFilled += newQty
+while goal != floor.sharesOwned[stock] {
     
-    //checkOrderStatuses(venue, stock: stock)
+    try floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice!, qty: 250, direction: "Buy", orderType: "Market")
     
-    print("\(totalFilled)/\(goal)")
+    floor.checkOrderStatuses(venue, stock: stock)
     
-}*/
+    print("I currently own \(floor.sharesOwned[stock]!) shares of \(stock)")
+   
+}
+
+
+var position    = 0
+var goalProfit  = 100000.0

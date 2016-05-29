@@ -21,11 +21,10 @@ func HTTPsendRequest(request: NSMutableURLRequest,callback: (String, String?) ->
     let task = NSURLSession.sharedSession().dataTaskWithRequest(request,completionHandler :
         {
             data, response, error in
-            if error != nil {
-                callback("", (error!.localizedDescription) as String)
-            } else {
-                callback(NSString(data: data!, encoding: NSUTF8StringEncoding) as! String,nil)
-            }
+            
+            error != nil ? callback("", (error!.localizedDescription) as String) :
+                           callback(NSString(data: data!, encoding: NSUTF8StringEncoding) as! String,nil)
+
     })
     
     task.resume()
@@ -45,13 +44,8 @@ func HTTPGetJSON(url: String, callback: (Dictionary<String, AnyObject>, String?)
         HTTPsendRequest(request) {
             (data: String, error: String?) -> Void in
             
-            if error != nil {
-                callback(Dictionary<String, AnyObject>(), error)
-                
-            } else {
-                let jsonObj = JSONToDict(data)
-                callback(jsonObj, nil)
-            }
+            error != nil ? callback(Dictionary<String, AnyObject>(), error) : callback(JSONToDict(data), nil)
+
         }
     
     sleep(2)
@@ -73,9 +67,7 @@ func HTTPPostJSON(url: String,
         
         request.HTTPMethod = "POST"
         request.addValue("c081a375c684d85eeb16e263bdc7e8b5574ba280", forHTTPHeaderField: "X-Starfighter-Authorization")
-        
-        //request.addValue("c081a375c684d85eeb16e263bdc7e8b5574ba280", forHTTPHeaderField: "Cookie:api_key")
-
+    
         let jsonString = JSONToString(jsonObj)
         let data: NSData = jsonString.dataUsingEncoding(NSUTF8StringEncoding)!
         
@@ -83,13 +75,8 @@ func HTTPPostJSON(url: String,
                     HTTPsendRequest(request){
                         (data: String, error: String?) -> Void in
                         
-                        if error != nil {
-                            callback(Dictionary<String, AnyObject>(), error)
-                            
-                        } else {
-                            let jsonObj = JSONToDict(data)
-                            callback(jsonObj, nil)
-                        }
+                        error != nil ? callback(Dictionary<String, AnyObject>(), error) : callback(JSONToDict(data), nil)
+
                     }
        sleep(2)
 }

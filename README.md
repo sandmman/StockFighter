@@ -12,19 +12,30 @@ Drag and drop each file from finder into your XCode project. Ensure to check the
     // Initialize game manager
     var gm = StockFighter()
 
-    try gm.reset("first_steps")
+    try gm.reset("chock_a_block")
 
     var floor = Floor(game: gm)
 
-    var goal = 100000
+    var goal = 1000
     var totalFilled = 0
 
-    while goal != totalFilled {
+    let stock = floor.stock[0]
+    let venue = floor.venue[0]
+    let account = floor.account
 
-        let currentPrice = floor.requestQuote(venue, stock: stock)
+    print("Account Number: \(account)")
+    print("Stock: \(stock) Venue: \(venue)")
 
-        floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice, qty: 1000, direction: "Buy", orderType: "Market")
-        totalFilled += 1000
+    let currentPrice = floor.requestQuote(venue, stock: stock)
+
+    while goal != floor.sharesOwned[stock] {
+
+        try floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice!, qty: 250, direction: "Buy", orderType: "Market")
+
+        floor.checkOrderStatuses(venue, stock: stock)
+
+        print("I currently own \(floor.sharesOwned[stock]!) shares of \(stock)")
+
     }
 ```
 #### Note on state ####
@@ -37,6 +48,7 @@ In order to save state between runs, the API reads and writes to a .txt to save 
 - [x] HTTP Post/Get Request
 - [ ] Implement Sockets
 - [x] Save State
+- [ ] Asynchronous Threading
 
 ### API ###
 
@@ -55,10 +67,14 @@ In order to save state between runs, the API reads and writes to a .txt to save 
 | .requestTrade(account: String, venue: String, stock: String, price: Int, qty: Int, direction: String, orderType: String) | Makes Trade request for given parameters|
 |.requestQuote(venue: String, stock: String) -> Int | Returns current quote for given stocks|
 |.cancelOrder(venue: String, stock: String, id: Int | Cancels given order|
-|.checkOrderStatuses(venue: String, stock: String) | Checks open orders to see if they have been closed and updates totalFilled orders |
+|.checkOrderStatuses(venue: String, stock: String) | Checks open orders to see if they have been closed and updates sharesOwned and profit variables |
 |.getMyOrder(venue: String, stock: String, id: Int) | Returns status of given order|
 
 
 ### Comments ###
 
 I've been developing this API as a way to try and play StockFighter efficiently, while also trying to learn/practice writing libraries from scratch. The goal of the library is to make it as easy to use as possible and as such I've tried to keep things simple. Future work will broaden this with socket implementation in addition to general changes found through increased testing, especially on later levels which I haven't gotten to yet!
+
+### License ###
+
+This API Wrapper is released under the MIT license. See LICENSE for details.
