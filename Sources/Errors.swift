@@ -7,13 +7,13 @@
 //
 
 
-enum StockFighterErrors: ErrorType {
-    
+enum StockFighterErrors: ErrorProtocol {
+
     case StockFighterServersAreDown
     case ErrorReceivingData
     case InvalidInput
     case InvalidLevel
     case GameNotInitialized
-    
-    
+
+
 }

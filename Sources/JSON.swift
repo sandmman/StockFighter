@@ -12,44 +12,41 @@ import Foundation
     json string either pretty printed or standard
 */
 func JSONToString(value: AnyObject, prettyPrinted:Bool = false) -> String {
-    
-    let options = prettyPrinted ? NSJSONWritingOptions.PrettyPrinted : NSJSONWritingOptions(rawValue: 0)
-    
+
+    let options = prettyPrinted ? NSJSONWritingOptions.prettyPrinted : NSJSONWritingOptions(rawValue: 0)
+
     if NSJSONSerialization.isValidJSONObject(value) {
-        
+
         do {
-            let data = try NSJSONSerialization.dataWithJSONObject(value, options: options)
+            let data = try NSJSONSerialization.data(withJSONObject: value, options: options)
             if let string = NSString(data: data, encoding: NSUTF8StringEncoding) {
                 return string as String
             }
         }
         catch {
-            print("Error Stringifying")
+            print("JSONToString", error)
         }
-        
+
     }
-    
+
     return ""
-    
+
 }
 
 /* Purpose: Converts a serialized json string to a dictionary! */
 
 func JSONToDict(string: String) -> [String: AnyObject]{
-    
-    
-    if let data = string.dataUsingEncoding(NSUTF8StringEncoding){
-        
+
+
+    if let data = string.data(using: NSUTF8StringEncoding){
         do {
-            if let dictionary = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers) as? [String: AnyObject]{
-                
+            if let dictionary = try NSJSONSerialization.jsonObject(with: data, options: NSJSONReadingOptions.mutableContainers) as? [String: AnyObject]{
                 return dictionary
-                
             }
+
         } catch {
-            
-            print("error")
-            
+            print("JSONToDict", error)
+
         }
     }
     return [String: AnyObject]()

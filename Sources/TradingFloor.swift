@@ -10,36 +10,35 @@ import Foundation
 
 
 public class Floor {
-    
-    var order_IDs: Dictionary<Int, Int>
+
+    var order_IDs: [Int: Int]
 
     var manager: StockFighter
-    
+
     lazy var venue : [String] = {
         return self.manager.instance!.venue
     }()
-    
+
     lazy var stock : [String] = {
         return self.manager.instance!.stock
     }()
-    
+
     lazy var account: String = {
         return self.manager.instance!.account
     }()
-    
+
     var sharesOwned: Dictionary<String, Int>
     var profit: Double
-    
+
     init(game: StockFighter){
         self.order_IDs = Dictionary<Int, Int>()
         self.manager = game
         self.sharesOwned = Dictionary<String, Int>()
         self.profit = 0.0
-        
     }
-    
+
     private func createOrder(account: String, venue: String, stock: String, price: Int, qty: Int, direction: String, orderType: String) -> [String: AnyObject] {
-        
+
         let order: [String: AnyObject] = [
             "account"   : account,
             "venue"     : venue,
@@ -49,111 +48,115 @@ public class Floor {
             "direction" : direction,
             "orderType" : orderType
         ]
-        
+
         return order
-        
+
     }
-    
+
     /* Makes a trade request to the server */
     func requestTrade(account: String, venue: String, stock: String, price: Int, qty: Int, direction: String, orderType: String) throws {
-        
-        if verifyData(direction, orderType: orderType) == false {
+
+        if verifyData(withDirection: direction, withType: orderType) == false {
             throw StockFighterErrors.InvalidInput
         }
-        
-        let order = createOrder(account,venue: venue, stock: stock, price: price, qty: qty, direction: direction, orderType: orderType)
-        
-        let response = manager.postRequest("\(manager.base_url)/venues/\(venue)/stocks/\(stock)/orders", jsonObj: order)
+        print(account,venue,stock,price,qty)
+        let order = createOrder(account: account, venue: venue, stock: stock, price: price, qty: qty, direction: direction, orderType: orderType)
+
+        guard let response = manager.post(atURL: "\(manager.base_url)/venues/\(venue)/stocks/\(stock)/orders", jsonObj: order) else {
+            return
+        }
 
         response["id"] != nil ? self.order_IDs[Int(response["id"]! as! NSNumber)] = 0 : print("Trade Not Made")
-     
+
     }
-    
+
     /* Finds the most recent quote for a given stock */
-    func requestQuote(venue: String, stock: String) -> Int? {
-        
+    func requestQuote(venue: String, stock: String) throws -> Int? {
+
         let quoteUrl = "\(manager.base_url)/venues/\(venue)/stocks/\(stock)/quote"
-        if let bid = manager.getRequest(quoteUrl)["bid"] {
-            return Int(bid as! NSNumber)
+
+        guard let bid = manager.get(atURL: quoteUrl)?["bid"] else {
+            return nil
 
         }
-        return nil
+
+        return Int(bid as! NSNumber)
     }
-    
+
     /*
      Queries Server for a specific Order
      If found, returns a dictionary containing said order
      */
-    func getMyOrder(venue: String, stock: String, id: Int) -> Dictionary<String, AnyObject>? {
-        
-        return manager.getRequest("\(manager.base_url)/venues/\(venue)/stocks/\(stock)/orders/\(id)")
+    func getOrder(atVenue: String, withStock: String, withId: Int) -> [String: AnyObject]? {
+
+        return manager.get(atURL: "\(manager.base_url)/venues/\(atVenue)/stocks/\(withStock)/orders/\(withId)")
     }
-    
-    /* 
+
+    /*
      Returns a dictionary of all account orders
      If stock is specified, only orders for given stock are returned
      */
-    func getAllOrders(venue: String, stock: String? = nil) -> Dictionary<String, AnyObject>? {
+    func getOrders(atVenue: String, withStock: String? = nil) -> [String: AnyObject]? {
         var orderURL = ""
 
-        stock != nil ? (orderURL = "https://api.stockfighter.io/ob/api/venues/\(venue)/accounts/\(account)/stocks/\(stock!)/orders") :
-                       (orderURL = "https://api.stockfighter.io/ob/api/venues/\(venue)/accounts/\(account)/orders")
+        withStock != nil ? (orderURL = "https://api.stockfighter.io/ob/api/venues/\(atVenue)/accounts/\(account)/stocks/\(withStock!)/orders") :
+                           (orderURL = "https://api.stockfighter.io/ob/api/venues/\(atVenue)/accounts/\(account)/orders")
 
-        return manager.getRequest(orderURL)
-        
+        return manager.get(atURL: orderURL)
+
     }
-    
+
     /* Returns the orderbook for a particular stock*/
-    func getOrderBook(venue: String, stock: String) -> Dictionary<String,AnyObject> {
-        
-        return manager.getRequest("https://api.stockfighter.io/ob/api/venues/\(venue)/stocks/\(stock)")
+    func getOrderBook(atVenue: String, withStock: String) -> [String: AnyObject]? {
+
+        return manager.get(atURL: "https://api.stockfighter.io/ob/api/venues/\(atVenue)/stocks/\(withStock)")
     }
-    
+
     /* Cancels Given Order */
-    func cancelOrder(venue: String, stock: String, id: Int) {
-        
-        manager.getRequest("\(manager.base_url)/venues/\(venue)/stocks/\(stock)/orders/\(id)/cancel")
-        
+    func cancelOrder(atVenue: String, withStock: String, withId: Int) {
+
+        manager.get(atURL: "\(manager.base_url)/venues/\(atVenue)/stocks/\(withStock)/orders/\(withId)/cancel")
+
     }
-    
+
     /*
      Polls the open order dictionary to see if they have
      been closed and updates totalFilled orders
      Todo: Make decision on whether to cancel
      */
-    
-    func checkOrderStatuses(venue: String, stock: String) {
-        for (key, index) in order_IDs {
-            
-            if let order = getMyOrder(venue, stock: stock, id: key) {
-                
+
+    func checkOrderStatuses(atVenue: String, withStock: String) {
+        for (id, index) in order_IDs {
+
+            if let order = getOrder(atVenue: atVenue, withStock: withStock, withId: id) {
+
                 if order.count == 0 { continue }
-                    
+
                 else {
-                    
+
                     let fills = order["fills"]!
 
                     for i in index..<fills.count {
-                        
+
                         let shares = fills[i]["qty"]!! as! Double
                         let price  = fills[i]["price"]!! as! Double
-                        
+
                         if sharesOwned[order["symbol"]! as! String] == nil { sharesOwned[order["symbol"]! as! String] = 0 }
-                        
+
                         if String(order["direction"]!) == "buy" {
                             profit -= shares * price
                             sharesOwned[order["symbol"]! as! String]! += Int(shares)
-                            
+
                         } else {
                             profit += shares * price
                             sharesOwned[order["symbol"]! as! String]! += Int(shares)
-                            
+
                         }
                     }
-                    order_IDs[key] = fills.count
-                    
-                    if String(order["open"]!) == "0" { order_IDs.removeValueForKey(key) }
-                    
+                    order_IDs[id] = fills.count
+
+                    if String(order["open"]!) == "0" { order_IDs.removeValue(forKey: id) }
+
                 }
 
             }
@@ -161,20 +164,20 @@ public class Floor {
     }
     //
     /* Verifies that direction and order type comply with expected types */
-    private func verifyData(direction: String, orderType: String) -> Bool {
-        
-        let dir  = direction.capitalizedString
-        let type = orderType.capitalizedString
-        
-        if ["Buy","Sell"].indexOf(dir) == nil {
+    private func verifyData(withDirection: String, withType: String) -> Bool {
+
+        let dir  = withDirection.capitalized
+        let type = withType.capitalized
+
+        if ["Buy","Sell"].index(of: dir) == nil {
             return false
         }
-        if ["Market","Fill-or-kill","Immediate-or-cancel","Limit"].indexOf(type) == nil {
+        if ["Market","Fill-or-kill","Immediate-or-cancel","Limit"].index(of: type) == nil {
             return false
         }
-        
+
         return true
     }
-    
-    
+
+
 }

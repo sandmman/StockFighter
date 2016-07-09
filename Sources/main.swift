@@ -10,7 +10,8 @@ import Foundation
 
 var gm = StockFighter()
 
-try gm.reset("chock_a_block")
+try gm.reset(level: "chock_a_block")
+
 
 var floor = Floor(game: gm)
 
@@ -22,19 +23,19 @@ let venue = floor.venue[0]
 let account = floor.account
 
 print("Account Number: \(account)")
-print("Stock: \(stock) Venue: \(venue)")
+print("Stock:          \(stock)     | Venue: \(venue)")
 
-let currentPrice = floor.requestQuote(venue, stock: stock)
+let currentPrice = try floor.requestQuote(venue: venue, stock: stock)
 
 
 while goal != floor.sharesOwned[stock] {
-    
-    try floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice!, qty: 250, direction: "Buy", orderType: "Market")
-    
-    floor.checkOrderStatuses(venue, stock: stock)
-    
+
+    try floor.requestTrade(account: account, venue: venue, stock: stock, price: currentPrice!, qty: 250, direction: "Buy", orderType: "Market")
+
+    floor.checkOrderStatuses(atVenue: venue, withStock: stock)
+
     print("I currently own \(floor.sharesOwned[stock]!) shares of \(stock)")
-   
+
 }
 
 
