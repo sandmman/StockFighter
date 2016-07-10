@@ -14,6 +14,9 @@ enum StockFighterErrors: ErrorProtocol {
     case InvalidInput
     case InvalidLevel
     case GameNotInitialized
+    case NoResponseFound
+    case ErrorStartingLevel(String)
+    case ErrorFromServer(String)
 
 
 }

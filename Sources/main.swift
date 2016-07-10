@@ -12,32 +12,25 @@ var gm = StockFighter()
 
 try gm.reset(level: "chock_a_block")
 
-
 var floor = Floor(game: gm)
 
-var goal = 1000
-var totalFilled = 0
+let goal = 1000
+let totalFilled = 0
 
-let stock = floor.stock[0]
-let venue = floor.venue[0]
+let stock = floor.stocks[0]
+let venue = floor.venues[0]
 let account = floor.account
 
-print("Account Number: \(account)")
-print("Stock:          \(stock)     | Venue: \(venue)")
-
-let currentPrice = try floor.requestQuote(venue: venue, stock: stock)
-
+let currentPrice = try floor.requestQuote(venue: venue, stock: stock).ask ?? 50
 
 while goal != floor.sharesOwned[stock] {
 
-    try floor.requestTrade(account: account, venue: venue, stock: stock, price: currentPrice!, qty: 250, direction: "Buy", orderType: "Market")
+    let result = floor.requestTrade(account: account, venue: venue, stock: stock, price: currentPrice, qty: 250, direction: Direction.buy, orderType: OrderType.market)
+
+    floor.order_IDs[result.id] = 0
 
     floor.checkOrderStatuses(atVenue: venue, withStock: stock)
 
     print("I currently own \(floor.sharesOwned[stock]!) shares of \(stock)")
 
 }
-
-
-var position    = 0
-var goalProfit  = 100000.0

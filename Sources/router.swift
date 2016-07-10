@@ -8,6 +8,10 @@
 
 import Foundation
 
+enum Method: String {
+    case GET, POST
+}
+
 class Router: NSObject {
 
     let session = NSURLSession.shared();
@@ -17,6 +21,25 @@ class Router: NSObject {
         request.setValue("c081a375c684d85eeb16e263bdc7e8b5574ba280", forHTTPHeaderField: "X-Starfighter-Authorization")
     }
 
+    func request(withMethod: Method, to: String, withParameters: [String: String], callback: ([String: AnyObject]?, ErrorProtocol?) -> Void) {
+         let request = NSMutableURLRequest(url: NSURL(string: to)!)
+         request.setValue("c081a375c684d85eeb16e263bdc7e8b5574ba280", forHTTPHeaderField: "X-Starfighter-Authorization")
+
+         if withMethod == Method.POST {
+             /*let jsonString = JSONToString(value: jsonObj)
+             let data: NSData = jsonString.data(using: NSUTF8StringEncoding)!*/
+         }
+
+         //request.httpBody = data
+         requestManager(request: request) {
+             data, error in
+
+             error != nil ? callback(nil, error) : callback(JSONToDict(string: data!), nil)
+
+         }
+
+
+    }
     /*
      Method: Constructs an HTTP GET request to the destination url
      */
@@ -44,6 +67,8 @@ class Router: NSObject {
 
              let request = NSMutableURLRequest(url: NSURL(string: withUrl)!)
              request.setValue("c081a375c684d85eeb16e263bdc7e8b5574ba280", forHTTPHeaderField: "X-Starfighter-Authorization")
+
+             request.httpMethod = "GET"
 
              requestManager(request: request) {
                  data, error in

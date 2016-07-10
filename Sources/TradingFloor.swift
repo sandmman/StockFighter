@@ -15,11 +15,11 @@ public class Floor {
 
     var manager: StockFighter
 
-    lazy var venue : [String] = {
+    lazy var venues : [String] = {
         return self.manager.instance!.venue
     }()
 
-    lazy var stock : [String] = {
+    lazy var stocks : [String] = {
         return self.manager.instance!.stock
     }()
 
@@ -27,17 +27,17 @@ public class Floor {
         return self.manager.instance!.account
     }()
 
-    var sharesOwned: Dictionary<String, Int>
+    var sharesOwned: [String: Int]
     var profit: Double
 
     init(game: StockFighter){
-        self.order_IDs = Dictionary<Int, Int>()
+        self.order_IDs = [Int: Int]()
         self.manager = game
-        self.sharesOwned = Dictionary<String, Int>()
+        self.sharesOwned = [String: Int]()
         self.profit = 0.0
     }
 
-    private func createOrder(account: String, venue: String, stock: String, price: Int, qty: Int, direction: String, orderType: String) -> [String: AnyObject] {
+    private func createOrder(account: String, venue: String, stock: String, price: Int, qty: Int, direction: Direction, orderType: OrderType) -> [String: AnyObject] {
 
         let order: [String: AnyObject] = [
             "account"   : account,
@@ -45,8 +45,8 @@ public class Floor {
             "symbol"    : stock,
             "price"     : price,
             "qty"       : qty,
-            "direction" : direction,
-            "orderType" : orderType
+            "direction" : direction.rawValue,
+            "orderType" : orderType.rawValue
         ]
 
         return order
@@ -54,71 +54,87 @@ public class Floor {
     }
 
     /* Makes a trade request to the server */
-    func requestTrade(account: String, venue: String, stock: String, price: Int, qty: Int, direction: String, orderType: String) throws {
+    func requestTrade(account: String, venue: String, stock: String, price: Int, qty: Int, direction: Direction, orderType: OrderType) -> Order {
 
-        if verifyData(withDirection: direction, withType: orderType) == false {
-            throw StockFighterErrors.InvalidInput
-        }
-        print(account,venue,stock,price,qty)
         let order = createOrder(account: account, venue: venue, stock: stock, price: price, qty: qty, direction: direction, orderType: orderType)
 
-        guard let response = manager.post(atURL: "\(manager.base_url)/venues/\(venue)/stocks/\(stock)/orders", jsonObj: order) else {
-            return
+        guard let response = manager.post(atURL: "\(manager.base_url)/venues/\(venue)/stocks/\(stock)/orders", jsonObj: order)
+                    where response["error"] == nil else {
+            exit(1)
         }
 
-        response["id"] != nil ? self.order_IDs[Int(response["id"]! as! NSNumber)] = 0 : print("Trade Not Made")
-
+        return Parser.parseOrder(order: response)
     }
 
     /* Finds the most recent quote for a given stock */
-    func requestQuote(venue: String, stock: String) throws -> Int? {
+    func requestQuote(venue: String, stock: String) throws -> Quote {
 
         let quoteUrl = "\(manager.base_url)/venues/\(venue)/stocks/\(stock)/quote"
 
-        guard let bid = manager.get(atURL: quoteUrl)?["bid"] else {
-            return nil
-
+        guard let quote = manager.get(atURL: quoteUrl)
+                where quote["error"] == nil else {
+            exit(1)
         }
 
-        return Int(bid as! NSNumber)
+        return Parser.parseQuote(response: quote)
     }
+
 
     /*
      Queries Server for a specific Order
      If found, returns a dictionary containing said order
      */
-    func getOrder(atVenue: String, withStock: String, withId: Int) -> [String: AnyObject]? {
+    func getOrder(atVenue: String, withStock: String, withId: Int) -> Order? {
 
-        return manager.get(atURL: "\(manager.base_url)/venues/\(atVenue)/stocks/\(withStock)/orders/\(withId)")
+        guard let order = manager.get(atURL: "\(manager.base_url)/venues/\(atVenue)/stocks/\(withStock)/orders/\(withId)")
+                    where order["error"] == nil else {
+            return nil
+        }
+
+        return Parser.parseOrder(order: order)
     }
 
     /*
      Returns a dictionary of all account orders
      If stock is specified, only orders for given stock are returned
      */
-    func getOrders(atVenue: String, withStock: String? = nil) -> [String: AnyObject]? {
+    func getOrders(atVenue: String, withStock: String? = nil) -> [Order] {
         var orderURL = ""
 
         withStock != nil ? (orderURL = "https://api.stockfighter.io/ob/api/venues/\(atVenue)/accounts/\(account)/stocks/\(withStock!)/orders") :
                            (orderURL = "https://api.stockfighter.io/ob/api/venues/\(atVenue)/accounts/\(account)/orders")
 
-        return manager.get(atURL: orderURL)
+        guard let orders = manager.get(atURL: orderURL)
+                where orders["error"] == nil else {
+            exit(1)
+        }
+
+        return Parser.parseOrders(response: orders)
 
     }
 
     /* Returns the orderbook for a particular stock*/
-    func getOrderBook(atVenue: String, withStock: String) -> [String: AnyObject]? {
+    func getOrderBook(atVenue: String, withStock: String) -> OrderBook {
 
-        return manager.get(atURL: "https://api.stockfighter.io/ob/api/venues/\(atVenue)/stocks/\(withStock)")
+        guard let response = manager.get(atURL: "https://api.stockfighter.io/ob/api/venues/\(atVenue)/stocks/\(withStock)")
+                where response["error"] == nil else {
+            exit(1)
+        }
+
+        return Parser.parseOrderBook(orders: response)
     }
 
     /* Cancels Given Order */
-    func cancelOrder(atVenue: String, withStock: String, withId: Int) {
+    func cancelOrder(atVenue: String, withStock: String, withId: Int) -> Order {
 
-        manager.get(atURL: "\(manager.base_url)/venues/\(atVenue)/stocks/\(withStock)/orders/\(withId)/cancel")
+        guard let response = manager.get(atURL: "\(manager.base_url)/venues/\(atVenue)/stocks/\(withStock)/orders/\(withId)/cancel")
+                where response["error"] == nil else {
+            exit(1)
+        }
+
+        return Parser.parseOrder(order: response)
 
     }
-
     /*
      Polls the open order dictionary to see if they have
      been closed and updates totalFilled orders
@@ -130,54 +146,31 @@ public class Floor {
 
             if let order = getOrder(atVenue: atVenue, withStock: withStock, withId: id) {
 
-                if order.count == 0 { continue }
+                let fills = order.fills
 
-                else {
+                for i in index..<fills.count {
 
-                    let fills = order["fills"]!
+                    let shares = fills[i].qty
+                    let price  = fills[i].price
 
-                    for i in index..<fills.count {
+                    if sharesOwned[order.symbol] == nil { sharesOwned[order.symbol] = 0 }
 
-                        let shares = fills[i]["qty"]!! as! Double
-                        let price  = fills[i]["price"]!! as! Double
+                    if order.direction == Direction.buy {
+                        profit -= Double(shares) * Double(price)
+                        sharesOwned[order.symbol]! += Int(shares)
 
-                        if sharesOwned[order["symbol"]! as! String] == nil { sharesOwned[order["symbol"]! as! String] = 0 }
+                    } else {
+                        profit += Double(shares) * Double(price)
+                        sharesOwned[order.symbol]! += Int(shares)
 
-                        if String(order["direction"]!) == "buy" {
-                            profit -= shares * price
-                            sharesOwned[order["symbol"]! as! String]! += Int(shares)
-
-                        } else {
-                            profit += shares * price
-                            sharesOwned[order["symbol"]! as! String]! += Int(shares)
-
-                        }
                     }
                     order_IDs[id] = fills.count
 
-                    if String(order["open"]!) == "0" { order_IDs.removeValue(forKey: id) }
+                    if !order.open  { order_IDs.removeValue(forKey: id) }
 
                 }
 
             }
         }
     }
-    //
-    /* Verifies that direction and order type comply with expected types */
-    private func verifyData(withDirection: String, withType: String) -> Bool {
-
-        let dir  = withDirection.capitalized
-        let type = withType.capitalized
-
-        if ["Buy","Sell"].index(of: dir) == nil {
-            return false
-        }
-        if ["Market","Fill-or-kill","Immediate-or-cancel","Limit"].index(of: type) == nil {
-            return false
-        }
-
-        return true
-    }
-
-
 }
