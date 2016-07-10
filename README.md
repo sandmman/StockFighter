@@ -3,9 +3,15 @@
 This is a basic client library written in Swift for [StockFighter](https://www.stockfighter.io/ui/account) providing methods to wrap the StockFighter API to fluidly handle HTTP POST/GET requests, serialization, and authorization.
 
 ### Installation ###
-1. Add to XCode
+
+> Requires the [swift-DEVELOPMENT-06-06 SNAPSHOT](https://swift.org/download/).
+
+1. Download the [Swift DEVELOPMENT 06-06 snapshot](https://swift.org/download/#snapshots)
+
+2. Add to XCode
 
 Drag and drop each file from finder into your XCode project. Ensure to check the add to target box for your target project
+
 
 ### Sample Usage ###
 ```swift
