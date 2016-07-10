@@ -1,5 +1,7 @@
 # Stock Fighter API #
 
+![Build Status](https://travis-ci.org/sandmman/StockFighter.svg?branch=master)
+
 This is a basic client library written in Swift for [StockFighter](https://www.stockfighter.io/ui/account) providing methods to wrap the StockFighter API to fluidly handle HTTP POST/GET requests, serialization, and authorization.
 
 ### Installation ###
