@@ -63,7 +63,7 @@ struct Parser {
         let account     : String    = order["account"]!    as! String
         let id          : Int       = order["id"]!         .integerValue
         let qty         : Int       = order["qty"]!        .integerValue
-        let price       : Int    = order["price"]!      .integerValue
+        let price       : Int       = order["price"]!      .integerValue
         let totalFilled : Int       = order["totalFilled"]!.integerValue
         let originalQty : Int       = order["originalQty"]!.integerValue
         let fills       : [Fill]    = parseFills(fills: order["fills"]! as! NSArray)
@@ -87,21 +87,38 @@ struct Parser {
         return orders
     }
 
-    static func parseBidsAsks(object: AnyObject?) -> [BidsAsks]? {
+    static func parseBids(object: AnyObject?) -> [Bid]? {
         guard let object = object as? NSArray else {
             return nil
         }
-        let bids_asks: [BidsAsks] = object.flatMap {
+        let bids: [Bid] = object.flatMap {
             item in
 
             let price = item["price"]!!.integerValue
             let qty = item["qty"]!!.integerValue
             let isBuy = item["isBuy"]! as! Bool
 
-            return BidsAsks(price: price!, qty: qty!, isBuy: isBuy)
+            return Bid(price: price!, qty: qty!, isBuy: isBuy)
         }
 
-        return bids_asks
+        return bids
+    }
+
+    static func parseAsks(object: AnyObject?) -> [Ask]? {
+        guard let object = object as? NSArray else {
+            return nil
+        }
+        let asks: [Ask] = object.flatMap {
+            item in
+
+            let price = item["price"]!!.integerValue
+            let qty = item["qty"]!!.integerValue
+            let isBuy = item["isBuy"]! as! Bool
+
+            return Ask(price: price!, qty: qty!, isBuy: isBuy)
+        }
+
+        return asks
     }
 
     static func parseOrderBook(orders: [String: AnyObject]) -> OrderBook {
@@ -109,8 +126,8 @@ struct Parser {
         let venue    : String = orders["venue"]!      as! String
         let timestamp: NSDate = parseTimestamp(stamp: orders["ts"]! as? String)!
         let symbol   : String = orders["symbol"]!     as! String
-        let bids = parseBidsAsks(object: orders["bids"])
-        let asks = parseBidsAsks(object: orders["asks"])
+        let bids = parseBids(object: orders["bids"])
+        let asks = parseAsks(object: orders["asks"])
 
         return OrderBook(ok: ok, venue: venue, symbol: symbol, bids: bids, asks: asks, timestamp: timestamp, error: nil)
 

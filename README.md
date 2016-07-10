@@ -123,7 +123,13 @@ struct OrderBook {
     let error: ErrorProtocol?
 }
 
-struct BidsAsks {
+struct Ask {
+    let price: Int
+    let qty: Int
+    let isBuy: Bool
+}
+
+struct Bid {
     let price: Int
     let qty: Int
     let isBuy: Bool

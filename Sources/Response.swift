@@ -96,12 +96,12 @@ struct OrderBook {
     let ok: Bool
     let venue: String
     let symbol: String
-    let bids: [BidsAsks]?
-    let asks: [BidsAsks]?
+    let bids: [Bid]?
+    let asks: [Ask]?
     let timestamp: NSDate
     let error: ErrorProtocol?
 
-    init(ok: Bool, venue: String, symbol: String, bids: [BidsAsks]?, asks: [BidsAsks]?, timestamp: NSDate, error: ErrorProtocol? = nil) {
+    init(ok: Bool, venue: String, symbol: String, bids: [Bid]?, asks: [Ask]?, timestamp: NSDate, error: ErrorProtocol? = nil) {
         self.ok = ok
         self.venue = venue
         self.symbol = symbol
@@ -112,7 +112,19 @@ struct OrderBook {
     }
 }
 
-struct BidsAsks {
+struct Ask {
+    let price: Int
+    let qty: Int
+    let isBuy: Bool
+
+    init(price: Int, qty: Int, isBuy: Bool) {
+        self.price = price
+        self.qty = qty
+        self.isBuy = isBuy
+    }
+}
+
+struct Bid {
     let price: Int
     let qty: Int
     let isBuy: Bool
