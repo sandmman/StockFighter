@@ -10,29 +10,30 @@ Drag and drop each file from finder into your XCode project. Ensure to check the
 ### Sample Usage ###
 ```swift
     // Initialize game manager
+    import Foundation
+
     var gm = StockFighter()
 
-    try gm.reset("chock_a_block")
+    try gm.reset(level: "chock_a_block")
 
     var floor = Floor(game: gm)
 
-    var goal = 1000
-    var totalFilled = 0
+    let goal = 1000
+    let totalFilled = 0
 
-    let stock = floor.stock[0]
-    let venue = floor.venue[0]
+    let stock = floor.stocks[0]
+    let venue = floor.venues[0]
     let account = floor.account
 
-    print("Account Number: \(account)")
-    print("Stock: \(stock) Venue: \(venue)")
-
-    let currentPrice = floor.requestQuote(venue, stock: stock)
+    let currentPrice = try floor.requestQuote(venue: venue, stock: stock).ask ?? 50
 
     while goal != floor.sharesOwned[stock] {
 
-        try floor.requestTrade(account, venue: venue, stock: stock, price: currentPrice!, qty: 250, direction: "Buy", orderType: "Market")
+        let result = floor.requestTrade(account: account, venue: venue, stock: stock, price: currentPrice, qty: 250, direction: Direction.buy, orderType: OrderType.market)
 
-        floor.checkOrderStatuses(venue, stock: stock)
+        floor.order_IDs[result.id] = 0
+
+        floor.checkOrderStatuses(atVenue: venue, withStock: stock)
 
         print("I currently own \(floor.sharesOwned[stock]!) shares of \(stock)")
 
@@ -70,6 +71,70 @@ In order to save state between runs, the API reads and writes to a .txt to save 
 |.checkOrderStatuses(venue: String, stock: String) | Checks open orders to see if they have been closed and updates sharesOwned and profit variables |
 |.getMyOrder(venue: String, stock: String, id: Int) | Returns status of given order|
 
+#### Return Objects ####
+```swift
+struct Heartbeat {
+    let ok: Bool
+    let venue: String
+    let error: ErrorProtocol?
+}
+
+struct Quote {
+    let ok: Bool
+    let symbol: String
+    let venue: String
+    let bid: Int?
+    let ask: Int?
+    let bidSize: Int
+    let askSize: Int
+    let bidDepth: Int
+    let askDepth: Int
+    let last: Int?
+    let lastSize: Int?
+    let lastTrade: Int?
+    let quoteTime: NSDate?
+}
+
+struct Order {
+    let ok: Bool
+    let symbol: String
+    let venue: String
+    let direction: Direction
+    let originalQty: Int
+    let qty: Int
+    let price: Int
+    let orderType: OrderType
+    let id: Int
+    let account: String
+    let timestamp: NSDate
+    let fills: [Fill]
+    let totalFilled: Int
+    let open: Bool
+    let error: ErrorProtocol?
+}
+
+struct OrderBook {
+    let ok: Bool
+    let venue: String
+    let symbol: String
+    let bids: [BidsAsks]?
+    let asks: [BidsAsks]?
+    let timestamp: NSDate
+    let error: ErrorProtocol?
+}
+
+struct BidsAsks {
+    let price: Int
+    let qty: Int
+    let isBuy: Bool
+}
+
+struct Fill {
+    let price: Int
+    let qty: Int
+    let timestamp: NSDate
+}
+```
 
 ### Comments ###
 
